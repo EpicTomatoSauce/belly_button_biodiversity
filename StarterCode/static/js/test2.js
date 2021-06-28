@@ -21,16 +21,12 @@ function init() {
 
 // function which pulls the data required from samples.json
 function dataretrieval(sampleID) {
-    d3.json('samples.json').then ((data) => {
-        var testSubject = data.samples.filter((val) => val.id == sampleID);
-        // test
-        console.log(data);
-        console.log(testSubject);
+    d3.json('samples.json').then (data => {
+        var testSubject = data.samples.filter((val) => val.id === sampleID);
+        // console.log(testSubject);
         var testSubjectObj = testSubject[0];
-        // test
         console.log(testSubjectObj);
         var otuIDs = testSubjectObj.otu_ids;
-        // test
         console.log(otuIDs);
         // create a list to append the members of the otuIDs to
         var otuIDList = [];
@@ -43,7 +39,7 @@ function dataretrieval(sampleID) {
         var sampleMetadata = data.metadata.filter((val) => val.id == sampleID);
         sampleMetadata = sampleMetadata[0];
         // for guage chart, we require wfreq result
-        // var wfreq = sampleMetadata[6];
+        var wfreq = sampleMetadata[6];
         // create a variable in which we can call each of the elements of the page
         results = {
             idList: otuIDList,
@@ -78,13 +74,13 @@ function demographicTable(sampleMetadata) {
 // BAR CHART
 function barChart(results){
     // create variables which are called from the pull data above
-    var otuIDs = results.idList.slice(0,10).reverse();
-    var sampleValues = results.values.slice(0,10).reverse();
-    var otuLabels = results.labels.slice(0,10).reverse();
+    var otu_ids = results.idList.slice(0,10).reverse();
+    var sample_values = results.values.slice(0,10).reverse();
+    var otu_labels = results.labels.slice(0,10).reverse();
     var traceBAR = {
-        x: sampleValues,
-        y: otuIDs,
-        text: otuLabels,
+        x: sample_values,
+        y: otu_ids,
+        text: otu_labels,
         marker: {
             color: 'blue'
         },
@@ -115,7 +111,7 @@ d3.selectAll("#selDataset").on("change", optionChanged);
 
 // CREATE CHANGE CONDITION
 function optionChanged() {
+    var sampleID = d3.select('#selDataset').node().values;
     d3.selectAll('h5').remove();
-    var sampleID = d3.select("#selDataset").node().value;
     dataretrieval(sampleID);
 };
