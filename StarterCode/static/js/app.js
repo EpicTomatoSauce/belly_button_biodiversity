@@ -40,10 +40,11 @@ function dataretrieval(sampleID) {
 
         var otuLabels = testSubjectObj.otu_labels;
         var sampleValues = testSubjectObj.sample_values;
-        var sampleMetadata = data.metadata.filter((val) => val.id == sampleID);
+        let sampleMetadata = data.metadata.filter((val) => val.id == sampleID);
         sampleMetadata = sampleMetadata[0];
         // for guage chart, we require wfreq result
-        // var wfreq = sampleMetadata[6];
+        var wfreq = Object.values(sampleMetadata)[6];
+        console.log(wfreq);
         // create a variable in which we can call each of the elements of the page
         results = {
             idList: otuIDList,
@@ -53,9 +54,9 @@ function dataretrieval(sampleID) {
         };
         // charting elements
         barChart(results);
-        // bubbleChart(results);
+        bubbleChart(results);
         demographicTable(sampleMetadata);
-        // guageChart(wfreq);
+        gaugeChart(wfreq);
     })
 }
 
@@ -91,11 +92,11 @@ function barChart(results){
         type: 'bar',
         orientation: 'h'
     };
-    var dataBar = [traceBAR];
-    var layoutBar = {
-        title: "Top 10 OTUs",
-        xaxis: {title: "Sample Value"},
-        yaxis: {title: "OTU ID"},
+    var dataBAR = [traceBAR];
+    var layoutBAR = {
+        title: "<b>Top 10 OTUs</b>",
+        xaxis: {title: "<b>Sample Value</b>"},
+        yaxis: {title: "<b>OTU ID</b>"},
         yAxis: {
             tickmode: 'linear',
         },
@@ -106,7 +107,97 @@ function barChart(results){
             b: 50
         }
     };
-    Plotly.newPlot('bar',dataBar, layoutBar);
+    Plotly.newPlot('bar',dataBAR, layoutBAR);
+}
+
+// BUBBLE CHART
+function bubbleChart(results) {
+    // create variables which are called from the pull data above
+    var otuIDs = results.ids;
+    var sampleValues = results.values;
+    var otuLabels = results.labels;
+    var traceBUBBLE = {
+        x: otuIDs,
+        y: sampleValues,
+        mode: 'markers',
+        marker: {
+            size: sampleValues,
+            color: otuIDs,
+            // https://plotly.com/javascript/colorscales/
+            colorscale: 'Earth'
+        },
+        text: otuLabels
+    };
+    var dataBUBBLE = [traceBUBBLE];
+    var layoutBUBBLE = {
+        title: "<b>OTU ID compared to Sample Value</b>",
+        xaxis: {title: "<b>OTU ID</b>"},
+        yaxis: {title: "<b>Sample Value</b>"},
+        height: 500,
+        width: 1000
+    };
+    // PLOT BUBBLE CHART ON ID "BUBBLE"
+    Plotly.newPlot("bubble", dataBUBBLE, layoutBUBBLE);
+}
+
+// GUAGE CHART
+// https://plotly.com/javascript/gauge-charts/
+
+function gaugeChart(wfreq) {
+    console.log(wfreq);
+    var dataGAUGE = [
+        {
+            domain: {
+                x: [0,1], 
+                y: [0,1]
+            },
+            value: wfreq,
+            title: "<b>Weekly Washing Frequency</b><br>Scrubs per Week",
+            type: 'indicator',
+            mode: 'gauge+number',
+            gauge: {
+                axis: {
+                    range: [null, 9],
+                    tickwidth: 2,
+                    tickcolor: "black"
+                },
+                bar: {
+                    color: "gray"
+                },
+                borderwidth: 2,
+                bordercolor: "black",
+                steps: [
+                    // https://www.w3schools.com/colors/colors_picker.asp?colorhex=DC143C
+                    { range: [0, 1], color: "#db1414" },
+                    { range: [1, 2], color: "#db4614" },
+                    { range: [2, 3], color: "#db7814" },
+                    { range: [3, 4], color: "#dbaa14" },
+                    { range: [4, 5], color: "#dbdb14" },
+                    { range: [5, 6], color: "#aadb14" },
+                    { range: [6, 7], color: "#78db14" },
+                    { range: [7, 8], color: "#46db14" },
+                    { range: [8, 9], color: "#14db14" },
+                  ],
+                threshold: {
+                    line: {color: 'red',
+                    width: 4
+                    },
+                    thickness: 1,
+                    value: 490
+                },
+            },
+        },
+    ];
+    var layoutGAUGE = {
+        width: 500,
+        height: 400,
+        margin: {
+            t: 0,
+            b: 0
+        }
+    };
+    // PLOT GUAGE CHART ON ID "GUAGE"
+    Plotly.newPlot('gauge', dataGAUGE, layoutGAUGE);
 }
 
 init();
